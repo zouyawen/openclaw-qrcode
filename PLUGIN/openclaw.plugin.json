@@ -1,0 +1,65 @@
+{
+  "id": "qr-code",
+  "name": "QR Code Plugin",
+  "description": "Generate, decode, and beautify QR codes with advanced customization options including colors, logos, and styling. Provides both high-performance Node.js implementation and powerful Python-based advanced features.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "pythonPath": {
+        "type": "string",
+        "default": "python3",
+        "description": "Path to Python executable for advanced QR operations"
+      },
+      "enableAdvancedFeatures": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable advanced features requiring Python (logo embedding, gradient colors, etc.)"
+      },
+      "outputDirectory": {
+        "type": "string",
+        "default": "./qr-codes/",
+        "description": "Directory for storing generated QR images when using web channel"
+      },
+      "assetsDirectory": {
+        "type": "string", 
+        "default": "./qr-assets/",
+        "description": "Directory for storing logo and asset files when using web channel"
+      },
+      "autoProvideBase64": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically provide Base64 encoded image for web channel users"
+      }
+    }
+  },
+  "uiHints": {
+    "pythonPath": {
+      "label": "Python Path",
+      "placeholder": "python3",
+      "help": "Path to Python executable (default: python3)"
+    },
+    "enableAdvancedFeatures": {
+      "label": "Enable Advanced Features",
+      "help": "Requires Python with qrcode[pil], pillow, and pyzbar packages installed"
+    },
+    "outputDirectory": {
+      "label": "Output Directory",
+      "placeholder": "./qr-codes/",
+      "help": "Where to save generated QR images. Use ~/ for home directory, ./ for workspace relative."
+    },
+    "assetsDirectory": {
+      "label": "Assets Directory", 
+      "placeholder": "./qr-assets/",
+      "help": "Where to store logo and asset files. Use ~/ for home directory, ./ for workspace relative."
+    },
+    "autoProvideBase64": {
+      "label": "Auto Provide Base64",
+      "help": "Automatically include Base64 encoded image in web responses"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "openclaw-qr-code-skill",
+  "version": "1.0.1",
+  "description": "OpenClaw AgentSkill for QR code generation, decoding, and beautification with enhanced security and WhatsApp compatibility",
+  "keywords": ["openclaw", "agentskill", "qr-code", "whatsapp", "security"],
+  "homepage": "https://github.com/openclaw/qr-code-skill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openclaw/qr-code-skill.git"
+  },
+  "author": "OpenClaw Team",
+  "license": "MIT",
+  "openclaw": {
+    "skillName": "qr-code",
+    "skillVersion": "1.0.1"
+  }
+}
