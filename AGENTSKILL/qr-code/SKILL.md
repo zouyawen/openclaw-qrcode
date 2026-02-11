@@ -13,7 +13,14 @@ metadata:
 
 # QR Code Skill
 
-Generate, decode, and beautify QR codes with full customization options and enhanced security.
+**⚠️ This skill requires the companion plugin to function!**
+
+Install the plugin first:
+```bash
+npm install @zouyawen/openclaw-qr-code
+```
+
+Then place this skill file in your OpenClaw skills directory.
 
 ## Features
 - **Generate**: Create QR codes with custom colors, background, size, logo overlay, and format (PNG, JPG, SVG)
@@ -66,10 +73,15 @@ Note: Logo paths must be relative to the workspace and cannot contain `..` or ab
 - **Format**: Must be one of: png, jpg, jpeg, svg
 - **Logo Path**: Must be a relative path within the workspace directory
 
-## Installation
-This skill is available from [GitHub](https://github.com/zouyawen/openclaw-qrcode). Clone the repository and copy the `AGENTSKILL/qr-code` folder to your OpenClaw skills directory.
+## Installation Requirements
 
-For advanced features (logo embedding, gradient colors), also install the companion plugin from the same repository.
+This skill requires the [@zouyawen/openclaw-qr-code](https://www.npmjs.com/package/@zouyawen/openclaw-qr-code) plugin:
+
+```bash
+npm install @zouyawen/openclaw-qr-code
+```
+
+After installing the plugin, download this skill file from ClawHub and place it in your OpenClaw skills directory.
 
 ## Technical Details
 This skill leverages OpenClaw's built-in `qr_code_operations` tool which supports both Python-based advanced features and Node.js fallback for maximum compatibility across different environments. All operations include comprehensive error handling and security validation.

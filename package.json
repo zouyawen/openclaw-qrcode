@@ -1,9 +1,8 @@
 {
   "name": "openclaw-qr-code",
   "version": "1.0.0",
-  "description": "OpenClaw QR Code Plugin + Skill",
+  "description": "OpenClaw QR Code Plugin + Skill - Complete QR code solution",
   "private": true,
-  "workspaces": ["PLUGIN"],
   "repository": {
     "type": "git",
     "url": "https://github.com/zouyawen/openclaw-qrcode.git"

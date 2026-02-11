@@ -2,6 +2,7 @@
   "id": "qr-code",
   "name": "QR Code Plugin",
   "description": "Generate, decode, and beautify QR codes with advanced customization options including colors, logos, and styling. Provides both high-performance Node.js implementation and powerful Python-based advanced features.",
+  "companionSkill": "qr-code",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
