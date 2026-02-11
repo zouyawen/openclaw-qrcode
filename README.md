@@ -26,7 +26,7 @@ Perfect for most users who need basic QR code generation.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourname/openclaw-qrcode.git
+git clone https://github.com/zouyawen/openclaw-qrcode.git
 
 # Copy the AgentSkill to your OpenClaw skills directory
 cp -r openclaw-qrcode/AGENTSKILL/qr-code ~/.openclaw/skills/
@@ -41,10 +41,10 @@ Choose this if you need logo embedding, gradient colors, or enhanced decoding.
 
 ```bash
 # Install via OpenClaw plugin manager
-openclaw plugin install https://github.com/yourname/openclaw-qrcode
+openclaw plugin install https://github.com/zouyawen/openclaw-qrcode
 
 # Or manual installation
-git clone https://github.com/yourname/openclaw-qrcode.git
+git clone https://github.com/zouyawen/openclaw-qrcode.git
 cd openclaw-qrcode/PLUGIN
 # Follow PLUGIN/README.md for detailed setup
 ```
@@ -60,8 +60,7 @@ openclaw-qrcode/
 │   └── qr-code/             # Ready-to-copy skill folder
 ├── PLUGIN/                  # Full plugin mode
 │   ├── openclaw.plugin.json # Plugin manifest
-│   ├── skills/              # Companion AgentSkill
-│   └── scripts/             # Python implementation
+│   ├── scripts/             # Python implementation  
 └── docs/                    # Detailed documentation
 ```
 

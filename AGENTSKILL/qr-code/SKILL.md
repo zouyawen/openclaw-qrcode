@@ -4,7 +4,7 @@ description: Generate, decode, and beautify QR codes with customizable colors, l
 metadata:
   {
     "openclaw": {
-      "homepage": "https://github.com/openclaw/qr-code-skill",
+      "homepage": "https://github.com/zouyawen/openclaw-qrcode",
       "user-invocable": true,
       "emoji": "📱"
     }
@@ -67,7 +67,9 @@ Note: Logo paths must be relative to the workspace and cannot contain `..` or ab
 - **Logo Path**: Must be a relative path within the workspace directory
 
 ## Installation
-This skill is automatically available when installed in your OpenClaw skills directory.
+This skill is available from [GitHub](https://github.com/zouyawen/openclaw-qrcode). Clone the repository and copy the `AGENTSKILL/qr-code` folder to your OpenClaw skills directory.
+
+For advanced features (logo embedding, gradient colors), also install the companion plugin from the same repository.
 
 ## Technical Details
 This skill leverages OpenClaw's built-in `qr_code_operations` tool which supports both Python-based advanced features and Node.js fallback for maximum compatibility across different environments. All operations include comprehensive error handling and security validation.
