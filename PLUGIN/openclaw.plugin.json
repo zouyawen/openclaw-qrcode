@@ -1,7 +1,7 @@
 {
   "id": "qr-code",
   "name": "QR Code Plugin",
-  "description": "Generate, decode, and beautify QR codes with advanced customization options including colors, logos, and styling. Provides both high-performance Node.js implementation and powerful Python-based advanced features.",
+  "description": "Handle all QR code operations with advanced features including generation, decoding, beautification, and smart auto-detection of user intent.",
   "companionSkill": "qr-code",
   "configSchema": {
     "type": "object",
@@ -10,6 +10,11 @@
       "enabled": {
         "type": "boolean",
         "default": true
+      },
+      "autoHandleAllQRRequests": {
+        "type": "boolean", 
+        "default": true,
+        "description": "Automatically handle all QR code related requests"
       },
       "pythonPath": {
         "type": "string",
@@ -35,10 +40,19 @@
         "type": "boolean",
         "default": true,
         "description": "Automatically provide Base64 encoded image for web channel users"
+      },
+      "defaultColor": {
+        "type": "string",
+        "default": "#1976D2",
+        "description": "Default QR code color when not specified"
       }
     }
   },
   "uiHints": {
+    "autoHandleAllQRRequests": {
+      "label": "Auto Handle All QR Requests",
+      "help": "Enable automatic detection and handling of all QR code related conversations"
+    },
     "pythonPath": {
       "label": "Python Path",
       "placeholder": "python3",
@@ -61,6 +75,11 @@
     "autoProvideBase64": {
       "label": "Auto Provide Base64",
       "help": "Automatically include Base64 encoded image in web responses"
+    },
+    "defaultColor": {
+      "label": "Default Color",
+      "placeholder": "#1976D2",
+      "help": "Default QR code color (CSS color name or hex code)"
     }
   }
 }

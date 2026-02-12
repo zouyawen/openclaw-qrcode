@@ -1,14 +1,17 @@
 ---
 name: qr-code
-description: Generate, decode, and beautify QR codes with customizable colors, logos, and formats. Works across all OpenClaw channels including WhatsApp.
-metadata:
-  {
-    "openclaw": {
-      "homepage": "https://github.com/zouyawen/openclaw-qrcode",
-      "user-invocable": true,
-      "emoji": "📱"
-    }
-  }
+description: |
+  Handle ALL QR code related requests including:
+  - Generate QR codes from any text, URL, or content
+  - Decode/extract data from QR code images  
+  - Beautify/enhance existing QR codes with colors, logos, and styling
+  - Convert between different QR code formats
+  - Process QR codes for any OpenClaw channel (WhatsApp, Telegram, etc.)
+  Use this skill whenever user mentions QR codes, barcodes, scanning, encoding data, or requests to create/read/modify QR codes.
+openclaw:
+  homepage: https://github.com/zouyawen/openclaw-qrcode
+  user-invocable: true
+  emoji: "📱"
 ---
 
 # QR Code Skill
@@ -30,6 +33,26 @@ Then place this skill file in your OpenClaw skills directory.
 - **Automatic format handling**: Converts formats as needed for channel compatibility
 - **Enhanced security**: Path traversal protection, input validation, and secure error handling
 - **WhatsApp optimization**: Automatic SVG-to-PNG conversion for WhatsApp compatibility
+
+## Smart Auto-Detection
+
+Once installed, this plugin will **automatically handle all QR code related requests** without requiring specific commands:
+
+- Simply mention "QR code", "barcode", or "scan" in your conversation
+- Attach an image and ask "what does this say?"
+- Request to "make it look better" or "change the colors" 
+- The AI will automatically detect your intent and use the appropriate plugin function
+
+## Natural Language Examples
+
+The AI will automatically use this skill when you say:
+
+- "Create a QR code for my website"
+- "What does this QR code say?" (with image attached)
+- "Make this QR code look better with our brand colors"
+- "Generate a scannable QR code for my contact info"
+- "Convert this QR code to a different format"
+- "I need a QR code that works well on WhatsApp"
 
 ## Security Features
 - **Path traversal protection**: Logo paths are validated to prevent directory traversal attacks

@@ -14,6 +14,9 @@ interface QRCodeOptions {
   logoPath?: string;
   size?: number;
   format?: 'png' | 'jpg' | 'jpeg' | 'svg';
+  autoDetect?: boolean;
+  optimizeFor?: 'print' | 'web' | 'mobile' | 'whatsapp';
+  errorCorrection?: 'L' | 'M' | 'Q' | 'H';
 }
 
 interface QRCodePluginConfig {
@@ -23,6 +26,8 @@ interface QRCodePluginConfig {
   outputDirectory?: string;
   assetsDirectory?: string;
   autoProvideBase64?: boolean;
+  autoHandleAllQRRequests?: boolean;
+  defaultColor?: string;
 }
 
 // 路径解析函数（带安全验证）
@@ -103,6 +108,61 @@ function ensureDirectory(dirPath: string): void {
   }
 }
 
+// 智能操作检测
+function detectOperation(input: string, hasImageAttachment: boolean): string {
+  if (hasImageAttachment || (input && (input.endsWith('.png') || input.endsWith('.jpg') || input.endsWith('.jpeg') || input.includes('image') || input.includes('photo')))) {
+    return 'decode';
+  } else if (input && (input.startsWith('http://') || input.startsWith('https://') || input.includes('www.') || input.includes('@') || input.includes('tel:') || input.includes('mailto:'))) {
+    return 'generate';
+  } else if (input && input.trim().length > 0) {
+    return 'generate';
+  }
+  return 'generate'; // 默认操作
+}
+
+// 智能参数优化
+function optimizeOptions(input: string, options: QRCodeOptions, currentChannel: string, pluginConfig: QRCodePluginConfig): QRCodeOptions {
+  const optimized = { ...options };
+  
+  // 自动颜色选择
+  if (optimized.autoDetect || !optimized.color) {
+    if (input?.includes('https://') || input?.includes('http://') || input?.includes('www.')) {
+      optimized.color = '#1976D2'; // 蓝色适合链接
+    } else if (input?.includes('@') || input?.includes('mailto:')) {
+      optimized.color = '#4CAF50'; // 绿色适合邮件
+    } else if (input?.includes('tel:') || input?.includes('phone')) {
+      optimized.color = '#FF9800'; // 橙色适合电话
+    } else if (pluginConfig.defaultColor) {
+      optimized.color = pluginConfig.defaultColor;
+    }
+  }
+  
+  // 通道优化
+  if (optimized.optimizeFor || currentChannel) {
+    const channelOptimize = optimized.optimizeFor || 
+      (currentChannel === 'whatsapp' ? 'mobile' : 
+       currentChannel === 'telegram' ? 'mobile' : 'web');
+    
+    switch (channelOptimize) {
+      case 'whatsapp':
+      case 'mobile':
+        optimized.size = optimized.size || 12;
+        optimized.errorCorrection = optimized.errorCorrection || 'H'; // 高纠错率
+        break;
+      case 'print':
+        optimized.size = optimized.size || 20;
+        optimized.errorCorrection = optimized.errorCorrection || 'M';
+        break;
+      case 'web':
+        optimized.size = optimized.size || 10;
+        optimized.errorCorrection = optimized.errorCorrection || 'L';
+        break;
+    }
+  }
+  
+  return optimized;
+}
+
 // 获取友好的错误消息
 function getFriendlyErrorMessage(error: any): string {
   const message = error.message || String(error);
@@ -130,24 +190,44 @@ export default function (api: any) {
   // 注册 QR Code 工具
   api.registerTool({
     name: "qr_code_operations",
-    description: "Generate, decode, and beautify QR codes with various customization options. Supports both Python-based advanced features and Node.js fallback for basic operations.",
+    description: "Handle ALL QR code related requests including generation, decoding, beautification, and analysis with advanced customization options.",
     parameters: Type.Object({
-      operation: Type.Union([
+      operation: Type.Optional(Type.Union([
         Type.Literal("generate"),
         Type.Literal("decode"), 
-        Type.Literal("beautify")
-      ]),
-      input: Type.String({ description: "Input data: text/URL for generate, file path for decode/beautify" }),
+        Type.Literal("beautify"),
+        Type.Literal("analyze"),
+        Type.Literal("convert")
+      ])),
+      input: Type.String({ description: "Input data: text/URL for generate, file path/image for decode/beautify, or 'auto' for context detection" }),
       options: Type.Optional(Type.Object({
-        color: Type.Optional(Type.String({ description: "QR code color (default: black)" })),
+        color: Type.Optional(Type.String({ description: "QR code color (default: black). Accepts CSS names, hex codes (#FF0000), or RGB values" })),
         backgroundColor: Type.Optional(Type.String({ description: "Background color (default: white)" })),
         logoPath: Type.Optional(Type.String({ description: "Path to logo image file (must be in workspace)" })),
         size: Type.Optional(Type.Number({ description: "QR code size multiplier (default: 10, range: 1-50)" })),
-        format: Type.Optional(Type.String({ enum: ["png", "jpg", "jpeg", "svg"], description: "Output format (default: png)" }))
+        format: Type.Optional(Type.String({ enum: ["png", "jpg", "jpeg", "svg"], description: "Output format (default: png)" })),
+        autoDetect: Type.Optional(Type.Boolean({ description: "Auto-detect best settings based on content type" })),
+        optimizeFor: Type.Optional(Type.String({ enum: ["print", "web", "mobile", "whatsapp"], description: "Optimize QR code for specific use case" })),
+        errorCorrection: Type.Optional(Type.String({ enum: ["L", "M", "Q", "H"], description: "Error correction level (L=7%, M=15%, Q=25%, H=30%)" }))
       }))
     }),
     async execute(_id: string, params: any) {
-      const { operation, input, options = {} } = params;
+      // 检测是否有图像附件
+      const hasImageAttachment = api.context?.attachments?.some((att: any) => 
+        att.type === 'image' || att.media?.endsWith('.png') || att.media?.endsWith('.jpg')
+      );
+      
+      // 如果没有提供 input，尝试从附件获取
+      let input = params.input;
+      if (!input && hasImageAttachment) {
+        input = api.context?.attachments?.[0]?.media || 'attached-image';
+      }
+      
+      // 智能操作检测
+      const detectedOperation = params.operation || detectOperation(input, hasImageAttachment);
+      
+      // 合并选项
+      const options = { ...params.options } || {};
       
       try {
         // 获取当前通道信息
@@ -164,6 +244,9 @@ export default function (api: any) {
         const pluginConfig: QRCodePluginConfig = api.config?.plugins?.entries?.['qr-code']?.config || {};
         const workspace = api.config?.agents?.defaults?.workspace || process.cwd();
         
+        // 智能参数优化
+        const optimizedOptions = optimizeOptions(input, options, currentChannel, pluginConfig);
+        
         // 解析输出和素材目录
         const outputDir = resolveOutputDirectory(pluginConfig.outputDirectory, workspace);
         const assetsDir = resolveOutputDirectory(pluginConfig.assetsDirectory, workspace);
@@ -173,8 +256,8 @@ export default function (api: any) {
         ensureDirectory(assetsDir);
         
         // 验证 logoPath（如果提供）
-        if (options.logoPath) {
-          options.logoPath = validateLogoPath(options.logoPath, workspace, assetsDir);
+        if (optimizedOptions.logoPath) {
+          optimizedOptions.logoPath = validateLogoPath(optimizedOptions.logoPath, workspace, assetsDir);
         }
         
         // 创建友好的路径显示
@@ -186,12 +269,12 @@ export default function (api: any) {
         
         if (pythonAvailable) {
           // 使用 Python 脚本处理
-          const result = await executePythonQR(api, operation, input, options, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir, workspace);
+          const result = await executePythonQR(api, detectedOperation, input, optimizedOptions, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir, workspace);
           return result;
         } else {
           // 降级到 Node.js 基础功能
           api.logger.warn("Python not available, falling back to Node.js basic QR functionality");
-          const result = await executeNodeJSQR(api, operation, input, options, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir);
+          const result = await executeNodeJSQR(api, detectedOperation, input, optimizedOptions, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir);
           return result;
         }
       } catch (error) {
@@ -269,46 +352,14 @@ async function executePythonQR(api: any, operation: string, input: string, optio
     } else {
       // 处理生成/美化结果
       if (existsSync(outputPath)) {
-        if (isWebChannel) {
-          // Web 通道：返回友好消息 + 文件路径
-          let responseText = `## 📱 QR Code Generated Successfully!
-
-### 🔗 Content
-- **Content**: ${input}
-
-### 📁 File Location
-- **Saved to**: \`${friendlyOutputDir}\`
-
-### 🎨 Quick Actions
-- **Open Directory**: \`open "${outputDir}"\`
-- **Copy Path**: \`${friendlyOutputDir}/${fileName}\``;
-
-          // 如果有 logoPath 选项，提供素材目录提示
-          if (options.logoPath) {
-            responseText += `\n\n### 🖼️ Logo Assets
-- **Your logo**: \`${options.logoPath}\`
-- **Assets directory**: \`${friendlyAssetsDir}\``;
-          }
-
-          responseText += `\n\n### ❓ Need Base64?
-Reply with "base64" or "yes" to get the Base64 encoded version for web embedding.`;
-
-          return { 
-            content: [{ 
-              type: "text", 
-              text: responseText
-            }] 
-          };
-        } else {
-          // 其他通道：直接显示图片
-          return { 
-            content: [{ 
-              type: "image", 
-              media: outputPath,
-              caption: `QR code ${operation} completed successfully`
-            }] 
-          };
-        }
+        // 所有通道都返回图像（改进用户体验）
+        return { 
+          content: [{ 
+            type: "image", 
+            media: outputPath,
+            caption: `QR code ${operation} completed successfully`
+          }] 
+        };
       } else {
         throw new Error("Python script executed but no output file generated");
       }
@@ -349,46 +400,14 @@ async function executeNodeJSQR(api: any, operation: string, input: string, optio
     
     writeFileSync(outputPath, qrBuffer);
     
-    if (isWebChannel) {
-      // Web 通道：返回友好消息
-      let responseText = `## 📱 QR Code Generated Successfully!
-
-### 🔗 Content  
-- **Content**: ${input}
-
-### 📁 File Location
-- **Saved to**: \`${friendlyOutputDir}\`
-
-### 🎨 Quick Actions
-- **Open Directory**: \`open "${outputDir}"\`
-- **Copy Path**: \`${friendlyOutputDir}/${fileName}\``;
-
-      // 如果有 logoPath 选项，提供素材目录提示
-      if (options.logoPath) {
-        responseText += `\n\n### 🖼️ Logo Assets
-- **Your logo**: \`${options.logoPath}\`
-- **Assets directory**: \`${friendlyAssetsDir}\``;
-      }
-
-      responseText += `\n\n### ❓ Need Base64?
-Reply with "base64" or "yes" to get the Base64 encoded version for web embedding.`;
-
-      return { 
-        content: [{ 
-          type: "text", 
-          text: responseText
-        }] 
-      };
-    } else {
-      // 其他通道：直接显示图片
-      return { 
-        content: [{ 
-          type: "image", 
-          media: outputPath,
-          caption: "Basic QR code generated (Node.js fallback)"
-        }] 
-      };
-    }
+    // 所有通道都返回图像（改进用户体验）
+    return { 
+      content: [{ 
+        type: "image", 
+        media: outputPath,
+        caption: "Basic QR code generated (Node.js fallback)"
+      }] 
+    };
   } catch (error) {
     throw new Error(`Node.js QR generation failed: ${error.message}`);
   }

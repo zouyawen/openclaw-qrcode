@@ -1,38 +1,41 @@
-# OpenClaw QR Code Plugin + Skill
+# OpenClaw QR Code - Smart Auto-Detection
 
 ![OpenClaw QR Code](https://img.shields.io/badge/OpenClaw-QR_Code-2ea44f)
 
-A comprehensive QR code solution for OpenClaw with **advanced generation, decoding, and beautification capabilities**.
+A comprehensive QR code solution for OpenClaw with **smart auto-detection** that automatically handles all QR code related requests without requiring specific commands.
+
+## 🤖 Smart Auto-Detection Features
+
+Once installed, this plugin will **automatically handle all QR code related requests**:
+
+- **Natural Language**: "生成一个我的网站二维码" or "Create a QR code for my website"
+- **Auto Detection**: Attach an image and ask "这个二维码是什么内容？" 
+- **Smart Optimization**: Automatically optimizes for the current channel (WhatsApp, Telegram, etc.)
+- **Context Awareness**: Detects intent from natural conversation
+- **No Commands Needed**: Just speak naturally!
 
 ## 🚀 Installation
 
-This project requires **both the plugin and the skill** to function properly.
-
 ### Step 1: Install the Plugin
 ```bash
-# Option A: Install from npm (recommended)
-npm install @zouyawen/openclaw-qr-code
+# Clone the repository
+git clone https://github.com/zouyawen/openclaw-qrcode.git
 
-# Option B: Install from GitHub
-openclaw plugin install https://github.com/zouyawen/openclaw-qrcode
+# Copy plugin to OpenClaw plugins directory
+mkdir -p ~/.openclaw/plugins
+cp -r openclaw-qrcode/PLUGIN ~/.openclaw/plugins/qr-code-plugin
+
+# Install dependencies
+cd ~/.openclaw/plugins/qr-code-plugin
+npm install
 ```
 
 ### Step 2: Install the Skill
-1. Visit [ClawHub QR Code Skill](https://clawhub.com/skills/qr-code) (once published)
-2. Download the `qr-code.skill` file
-3. Place it in your OpenClaw skills directory: `~/.openclaw/skills/`
-
-### Step 3: Install Python Dependencies (Required)
 ```bash
-# Required for advanced features
-pip install qrcode[pil] pillow pyzbar opencv-python numpy
+# Copy skill to OpenClaw skills directory  
+cp -r openclaw-qrcode/AGENTSKILL/qr-code ~/.openclaw/skills/
 
-# On macOS, you may also need:
-brew install zbar
-```
-
-### Step 4: Restart OpenClaw
-```bash
+# Restart OpenClaw
 openclaw gateway restart
 ```
 
@@ -41,43 +44,35 @@ openclaw gateway restart
 ```
 openclaw-qrcode/
 ├── README.md                 # This file
-├── AGENTSKILL/              # OpenClaw Skill (for ClawHub)
-│   └── qr-code/             # Skill folder with SKILL.md
-├── PLUGIN/                  # OpenClaw Plugin (for npm)
-│   ├── openclaw.plugin.json # Plugin manifest
-│   ├── index.ts            # Plugin main code
-│   └── scripts/            # Python implementation
-└── LICENSE                  # MIT License
+├── AGENTSKILL/              # Smart skill with auto-detection
+│   └── qr-code/             # Skill folder
+└── PLUGIN/                  # Full plugin with advanced features
+    ├── openclaw.plugin.json # Plugin manifest
+    ├── scripts/             # Python implementation  
+    └── index.ts            # Enhanced plugin with smart detection
 ```
 
-## 🔒 Security Features
+## 🔒 Security
 
-- **Path traversal protection**: Prevents directory traversal attacks
-- **Input validation**: All parameters are strictly validated  
-- **Secure error handling**: No sensitive information leakage
-- **File access restrictions**: Only allows access within workspace
+- Input validation and sanitization
+- Protection against path traversal attacks  
+- Safe error handling
+- Secure temporary file management
 
-## 📝 Usage Examples
+## 🎯 Usage Examples
 
+### Natural Language (Recommended)
+- "生成一个蓝色的二维码，内容是 https://example.com"
+- "这个二维码图片里是什么内容？" (attach image)
+- "让这个二维码看起来更好看，用我们的品牌颜色"
+- "为 WhatsApp 优化这个二维码"
+
+### Command Mode (Optional)
 ```
-/qr generate https://example.com color=red backgroundColor=white size=10 format=png
-/qr decode [attach QR code image]
-/qr beautify [attach QR code image] color=green backgroundColor=black size=12
-/qr generate https://brand.com logoPath=logo.png gradient=true
+/qr generate https://example.com color=red backgroundColor=white
+/qr decode [attach QR image]  
+/qr beautify [attach QR image] color=blue size=12
 ```
-
-## 🌟 Features
-
-- **Generate**: Create QR codes with custom colors, background, size, logo overlay, and format (PNG, JPG, SVG)
-- **Decode**: Extract data from QR code images
-- **Beautify**: Enhance existing QR codes with new styling while preserving data
-- **Cross-channel compatibility**: Works across all OpenClaw channels including WhatsApp, Telegram, Discord
-- **Advanced customization**: Logo embedding, gradient colors, rounded corners
-- **WhatsApp optimization**: Automatic format conversion for WhatsApp compatibility
-
-## 🤝 Contributing
-
-Contributions welcome! Please maintain the Plugin + Skill separation when adding new features.
 
 ## 📜 License
 
