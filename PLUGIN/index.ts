@@ -17,6 +17,8 @@ interface QRCodeOptions {
   autoDetect?: boolean;
   optimizeFor?: 'print' | 'web' | 'mobile' | 'whatsapp';
   errorCorrection?: 'L' | 'M' | 'Q' | 'H';
+  dotStyle?: string;
+  gradient?: boolean;
 }
 
 interface QRCodePluginConfig {
@@ -163,6 +165,54 @@ function optimizeOptions(input: string, options: QRCodeOptions, currentChannel: 
   return optimized;
 }
 
+// 获取自然语言友好提示
+function getNaturalLanguageTips(operation: string, options: QRCodeOptions, friendlyOutputDir: string, friendlyAssetsDir: string, workspace: string): string {
+  const tips = [];
+  
+  // 基础成功消息
+  if (operation === 'generate') {
+    tips.push("✅ 你的二维码已经生成好了！");
+  } else if (operation === 'decode') {
+    tips.push("🔍 二维码内容已成功解码！");
+  } else if (operation === 'beautify') {
+    tips.push("🎨 二维码美化完成！");
+  }
+  
+  // 文件位置提示
+  tips.push(`\n📁 **文件保存位置**:\n- 二维码图片: \`${friendlyOutputDir}\``);
+  
+  // 高级功能提示
+  const hasAdvancedFeatures = options.dotStyle || options.gradient || options.logoPath;
+  
+  if (hasAdvancedFeatures) {
+    tips.push("\n✨ **你使用了高级功能**:");
+    if (options.dotStyle === 'rounded') {
+      tips.push("- 圆点样式: 让二维码看起来更现代");
+    }
+    if (options.gradient) {
+      tips.push("- 渐变效果: 每个点都有不同的颜色");
+    }
+    if (options.logoPath) {
+      tips.push("- 自定义Logo: 中心嵌入了你的品牌标识");
+    }
+  }
+  
+  // 使用建议
+  tips.push("\n💡 **下次你可以这样告诉我**:");
+  tips.push("- \"生成一个圆点样式的二维码\"");
+  tips.push("- \"用蓝色和黄色渐变的二维码\"");
+  tips.push("- \"在二维码中间加上我的logo\"");
+  tips.push("- \"做一个彩色的、有logo的圆点二维码\"");
+  
+  // Logo位置提示
+  tips.push(`\n🖼️ **Logo素材位置**:\n把你的logo图片放在 \`${friendlyAssetsDir}\` 目录里，我就能自动找到它！`);
+  
+  // 示例
+  tips.push("\n📋 **完整示例**:\n\"帮我生成一个圆点渐变的二维码，用绿色和金色，中间加上我的logo\"");
+  
+  return tips.join('\n');
+}
+
 // 获取友好的错误消息
 function getFriendlyErrorMessage(error: any): string {
   const message = error.message || String(error);
@@ -208,7 +258,9 @@ export default function (api: any) {
         format: Type.Optional(Type.String({ enum: ["png", "jpg", "jpeg", "svg"], description: "Output format (default: png)" })),
         autoDetect: Type.Optional(Type.Boolean({ description: "Auto-detect best settings based on content type" })),
         optimizeFor: Type.Optional(Type.String({ enum: ["print", "web", "mobile", "whatsapp"], description: "Optimize QR code for specific use case" })),
-        errorCorrection: Type.Optional(Type.String({ enum: ["L", "M", "Q", "H"], description: "Error correction level (L=7%, M=15%, Q=25%, H=30%)" }))
+        errorCorrection: Type.Optional(Type.String({ enum: ["L", "M", "Q", "H"], description: "Error correction level (L=7%, M=15%, Q=25%, H=30%)" })),
+        dotStyle: Type.Optional(Type.String({ description: "Dot style for QR code modules (e.g., 'rounded')" })),
+        gradient: Type.Optional(Type.Boolean({ description: "Enable gradient color effect across QR code" }))
       }))
     }),
     async execute(_id: string, params: any) {
@@ -241,7 +293,7 @@ export default function (api: any) {
         }
         
         // 获取插件配置
-        const pluginConfig: QRCodePluginConfig = api.config?.plugins?.entries?.['qr-code']?.config || {};
+        const pluginConfig: QRCodePluginConfig = api.config?.plugins?.entries?.['openclaw-qr-code']?.config || {};
         const workspace = api.config?.agents?.defaults?.workspace || process.cwd();
         
         // 智能参数优化
@@ -270,11 +322,23 @@ export default function (api: any) {
         if (pythonAvailable) {
           // 使用 Python 脚本处理
           const result = await executePythonQR(api, detectedOperation, input, optimizedOptions, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir, workspace);
+          
+          // 添加自然语言提示
+          const tips = getNaturalLanguageTips(detectedOperation, optimizedOptions, friendlyOutputDir, friendlyAssetsDir, workspace);
+          if (result.content && result.content[0]) {
+            result.content[0].caption = `${result.content[0].caption || ''}\n\n${tips}`;
+          }
           return result;
         } else {
           // 降级到 Node.js 基础功能
           api.logger.warn("Python not available, falling back to Node.js basic QR functionality");
           const result = await executeNodeJSQR(api, detectedOperation, input, optimizedOptions, outputDir, isWebChannel, friendlyOutputDir, friendlyAssetsDir);
+          
+          // 添加基础提示
+          const basicTips = `\n\n💡 **提示**: 安装 Python 可以解锁圆点、渐变、Logo 等高级功能！`;
+          if (result.content && result.content[0]) {
+            result.content[0].caption = `${result.content[0].caption || ''}${basicTips}`;
+          }
           return result;
         }
       } catch (error) {
@@ -308,7 +372,7 @@ async function checkPythonAvailability(): Promise<boolean> {
 async function executePythonQR(api: any, operation: string, input: string, options: QRCodeOptions, outputDir: string, isWebChannel: boolean, friendlyOutputDir: string, friendlyAssetsDir: string, workspace: string) {
   // Get the plugin directory dynamically
   const pluginDir = __dirname;
-  const scriptPath = join(pluginDir, 'scripts', 'qr-code', 'scripts', `${operation}_qr.py`);
+  const scriptPath = join(pluginDir, 'scripts', `${operation}_qr.py`);
   
   if (!existsSync(scriptPath)) {
     throw new Error(`Python script not found: ${scriptPath}`);

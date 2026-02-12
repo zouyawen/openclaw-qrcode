@@ -1,110 +1,86 @@
 ---
 name: qr-code
-description: |
-  Handle ALL QR code related requests including:
-  - Generate QR codes from any text, URL, or content
-  - Decode/extract data from QR code images  
-  - Beautify/enhance existing QR codes with colors, logos, and styling
-  - Convert between different QR code formats
-  - Process QR codes for any OpenClaw channel (WhatsApp, Telegram, etc.)
-  Use this skill whenever user mentions QR codes, barcodes, scanning, encoding data, or requests to create/read/modify QR codes.
+description: Generate, decode, and beautify QR codes with advanced customization including rounded dots, gradient colors, and logo integration. Smart auto-detection works with natural language across all OpenClaw channels.
 openclaw:
   homepage: https://github.com/zouyawen/openclaw-qrcode
   user-invocable: true
   emoji: "📱"
 ---
 
-# QR Code Skill
+# QR Code Skill - Smart Natural Language
 
-**⚠️ This skill requires the companion plugin to function!**
+**✨ No commands needed! Just speak naturally!**
 
-Install the plugin first:
+This skill provides **smart auto-detection** that automatically handles QR code requests from natural conversation:
+
+- "生成一个我的网站二维码" → Creates QR code for your website
+- "这个二维码图片是什么内容？" → Decodes attached QR image  
+- "让二维码看起来更现代，用圆点样式" → Applies rounded dots with gradient
+- "在中间加个logo" → Integrates your logo from `qr-assets/` folder
+
+## 🚀 Advanced Features
+
+### ✨ Visual Customization
+- **Rounded Dots**: Modern circular modules instead of squares
+- **Gradient Colors**: Each dot has different color (position-based gradient)
+- **Logo Integration**: Overlay your logo in the center (auto-safe area)
+- **High Error Correction**: Ensures scannability even with logo overlay
+
+### 🌐 Cross-Channel Compatibility
+- **WhatsApp**: Auto PNG conversion, mobile-optimized sizing
+- **Telegram**: Full feature support with media handling  
+- **WebChat**: Base64 preview + file download
+- **All Channels**: Consistent experience everywhere
+
+### 🔒 Security & Safety
+- **Path Validation**: Logo paths restricted to workspace only
+- **Input Sanitization**: All parameters strictly validated
+- **Error Handling**: Friendly messages with clear guidance
+- **File Safety**: Temporary files auto-cleanup
+
+## 📁 File Locations
+
+**Generated QR Codes**: `~/clawd/qr-codes/`  
+**Your Logo Assets**: `~/clawd/qr-assets/` (put your logo.png here)
+
+## 💬 Natural Language Examples
+
+### Generation
+- "帮我生成一个彩色的圆点二维码，链接是 https://example.com"
+- "用蓝色和黄色做渐变效果的二维码"
+- "为我的网站创建一个带logo的现代风格二维码"
+
+### Decoding  
+- "这个二维码图片里是什么内容？" (attach image)
+- "解码一下这个二维码"
+
+### Beautification
+- "让这个二维码更好看，用我们的品牌颜色"
+- "给这个二维码加上圆点样式和渐变"
+
+## ⚙️ Installation
+
+**Prerequisite**: Install the companion plugin first:
 ```bash
-npm install @zouyawen/openclaw-qr-code
+git clone https://github.com/zouyawen/openclaw-qrcode.git
+mkdir -p ~/.openclaw/plugins
+cp -r openclaw-qrcode/PLUGIN ~/.openclaw/plugins/qr-code-plugin
+cd ~/.openclaw/plugins/qr-code-plugin && npm install
 ```
 
-Then place this skill file in your OpenClaw skills directory.
-
-## Features
-- **Generate**: Create QR codes with custom colors, background, size, logo overlay, and format (PNG, JPG, SVG)
-- **Decode**: Extract data from QR code images
-- **Beautify**: Enhance existing QR codes with new styling while preserving data
-- **Cross-channel compatibility**: Works seamlessly across all OpenClaw channels including WhatsApp, Telegram, Discord, etc.
-- **Automatic format handling**: Converts formats as needed for channel compatibility
-- **Enhanced security**: Path traversal protection, input validation, and secure error handling
-- **WhatsApp optimization**: Automatic SVG-to-PNG conversion for WhatsApp compatibility
-
-## Smart Auto-Detection
-
-Once installed, this plugin will **automatically handle all QR code related requests** without requiring specific commands:
-
-- Simply mention "QR code", "barcode", or "scan" in your conversation
-- Attach an image and ask "what does this say?"
-- Request to "make it look better" or "change the colors" 
-- The AI will automatically detect your intent and use the appropriate plugin function
-
-## Natural Language Examples
-
-The AI will automatically use this skill when you say:
-
-- "Create a QR code for my website"
-- "What does this QR code say?" (with image attached)
-- "Make this QR code look better with our brand colors"
-- "Generate a scannable QR code for my contact info"
-- "Convert this QR code to a different format"
-- "I need a QR code that works well on WhatsApp"
-
-## Security Features
-- **Path traversal protection**: Logo paths are validated to prevent directory traversal attacks
-- **Input sanitization**: All color, size, and format parameters are strictly validated
-- **Secure error handling**: Comprehensive try-catch blocks prevent information leakage
-- **File access restrictions**: Only allows access to files within the workspace directory
-
-## Usage Examples
-
-### Generate QR Code
-```
-/qr generate https://mzt315.com color=red backgroundColor=white size=10 format=png
-```
-
-### Decode QR Code
-```
-/qr decode [attach QR code image]
-```
-
-### Beautify QR Code
-```
-/qr beautify [attach QR code image] color=green backgroundColor=black size=12
-```
-
-### With Logo (Secure)
-```
-/qr generate https://mzt315.com logoPath=logo.png
-```
-Note: Logo paths must be relative to the workspace and cannot contain `..` or absolute paths.
-
-## WhatsApp Compatibility
-- Automatically handles WhatsApp's format requirements (PNG/JPG only)
-- **Automatic SVG-to-PNG conversion**: If SVG is requested on WhatsApp, it's automatically converted to PNG
-- Returns MEDIA paths that can be sent directly to any channel
-- Optimized for mobile viewing with appropriate sizing
-
-## Input Validation
-- **Colors**: Must be valid CSS color names or hex codes (e.g., "red", "#FF0000")
-- **Background Colors**: Same validation as colors
-- **Size**: Must be a number between 1 and 50 (inclusive)
-- **Format**: Must be one of: png, jpg, jpeg, svg
-- **Logo Path**: Must be a relative path within the workspace directory
-
-## Installation Requirements
-
-This skill requires the [@zouyawen/openclaw-qr-code](https://www.npmjs.com/package/@zouyawen/openclaw-qr-code) plugin:
-
+**Install Skill**: Copy the AGENTSKILL folder to `~/.openclaw/skills/`
 ```bash
-npm install @zouyawen/openclaw-qr-code
+cp -r openclaw-qrcode/AGENTSKILL/qr-code ~/.openclaw/skills/
+openclaw gateway restart
 ```
 
-After installing the plugin, download this skill file from ClawHub and place it in your OpenClaw skills directory.
+## 🎯 Technical Details
 
-## Technical Details
-This skill leverages OpenClaw's built-in `qr_code_operations` tool which supports both Python-based advanced features and Node.js fallback for maximum compatibility across different environments. All operations include comprehensive error handling and security validation.
+This skill leverages the enhanced `qr_code_operations` tool with:
+- Python-based advanced rendering (rounded dots, gradients)
+- Node.js fallback for basic functionality  
+- Smart intent detection from natural language
+- Channel-specific optimizations
+- Comprehensive security validation
+
+**Note**: The companion plugin is required for advanced features (rounded dots, gradients, logo integration).

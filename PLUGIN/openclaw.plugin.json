@@ -1,5 +1,5 @@
 {
-  "id": "qr-code",
+  "id": "openclaw-qr-code",
   "name": "QR Code Plugin",
   "description": "Handle all QR code operations with advanced features including generation, decoding, beautification, and smart auto-detection of user intent.",
   "companionSkill": "qr-code",
