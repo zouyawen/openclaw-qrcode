@@ -1,102 +1,90 @@
-# OpenClaw QR Code Plugin 📱
+# OpenClaw QR Code - Smart Auto-Detection
 
 ![OpenClaw QR Code](https://img.shields.io/badge/OpenClaw-QR_Code-2ea44f)
 
-**智能二维码生成插件** - 支持圆点样式、渐变色彩、Logo 集成，完全通过自然语言交互！
+A comprehensive QR code solution for OpenClaw with **smart auto-detection** that automatically handles all QR code related requests without requiring specific commands.
 
-## 🚀 快速开始
+## 🎯 Quick Start
 
-### 一键安装（推荐）
+### From ClawHub (Basic Features)
+If you found this plugin on [ClawHub](https://clawhub.ai/zouyawen/openclaw-qr-code), you can install the basic version directly:
+
+1. Download the skill from ClawHub
+2. Extract to `~/.openclaw/skills/qr-code/`
+3. Restart OpenClaw: `openclaw gateway restart`
+
+> **💡 Want Full Features?**  
+> The ClawHub version only includes basic QR code functionality. For **rounded dots, gradient colors, logo integration, and natural language support**, visit our [GitHub repository](https://github.com/zouyawen/openclaw-qrcode) for complete installation!
+
+### From GitHub (Full Features - Recommended)
 ```bash
-# 安装完整功能
+# One-click full installation
 curl -s https://raw.githubusercontent.com/zouyawen/openclaw-qrcode/main/install.sh | bash
-
-# 重启 OpenClaw
 openclaw gateway restart
 ```
 
-### 基础安装（仅基本功能）
+## 🤖 Smart Auto-Detection Features
+
+Once installed, this plugin will **automatically handle all QR code related requests**:
+
+- **Natural Language**: "生成一个我的网站二维码" or "Create a QR code for my website"
+- **Auto Detection**: Attach an image and ask "这个二维码是什么内容？" 
+- **Smart Optimization**: Automatically optimizes for the current channel (WhatsApp, Telegram, etc.)
+- **Context Awareness**: Detects intent from natural conversation
+- **No Commands Needed**: Just speak naturally!
+
+## 🚀 Installation
+
+### Full Feature Installation (Recommended)
 ```bash
-# 从 ClawHub 安装技能
-mkdir -p ~/.openclaw/skills/qr-code
-curl -L https://clawhub.ai/zouyawen/openclaw-qr-code/download/skill.zip | tar -xz -C ~/.openclaw/skills/qr-code --strip=1
+curl -s https://raw.githubusercontent.com/zouyawen/openclaw-qrcode/main/install.sh | bash
 openclaw gateway restart
 ```
 
-## 🎨 功能特性
+### Basic Feature Installation (From ClawHub)
+```bash
+# Copy skill to OpenClaw skills directory  
+mkdir -p ~/.openclaw/skills/qr-code
+# Download skill.zip from ClawHub and extract here
+unzip skill.zip -d ~/.openclaw/skills/qr-code/
+openclaw gateway restart
+```
 
-### 🔮 智能自然语言
-- "**帮我生成一个圆点的渐变色二维码**"
-- "**在二维码中间加个 logo**"  
-- "**用蓝色和黄色做渐变效果**"
-- "**这个二维码图片里是什么内容？**"
-
-### 🎯 高级视觉效果
-- **圆点样式**: 现代化的圆角模块
-- **点级渐变**: 每个点都有不同颜色
-- **Logo 集成**: 自动居中，智能保护
-- **自定义配色**: 支持任何 CSS 颜色
-
-### 🔒 安全可靠
-- 路径遍历防护
-- 输入参数验证  
-- 安全错误处理
-- 高纠错级别确保扫描可靠性
-
-## 📁 文件位置
-
-| 文件类型 | 路径 |
-|---------|------|
-| 二维码输出 | `~/clawd/qr-codes/` |
-| Logo 素材 | `~/clawd/qr-assets/` |
-
-> 💡 **添加自己的 Logo**: 将 PNG/JPG 文件放入 `~/clawd/qr-assets/` 目录即可
-
-## 🧪 使用示例
-
-安装后，直接用自然语言对话：
-
-- "**生成一个我的网站二维码**" → 会询问网址并生成
-- "**让二维码看起来更现代**" → 自动应用圆点样式  
-- "**添加渐变效果**" → 应用色彩渐变
-- "**在中间放个 logo**" → 自动使用 `qr-assets/` 中的 logo
-
-## 📦 仓库结构
+## 📁 Repository Structure
 
 ```
 openclaw-qrcode/
-├── README.md                 # 这个文件
-├── install.sh               # 一键安装脚本
-├── LICENSE                  # MIT 许可证
-├── PLUGIN/                  # 完整插件
-│   ├── index.ts            # TypeScript 插件入口
-│   ├── scripts/            # Python 高级功能脚本
-│   └── openclaw.plugin.json
-└── AGENTSKILL/             # 技能定义
-    └── qr-code/
-        └── SKILL.md       # 技能文档
+├── README.md                 # This file
+├── AGENTSKILL/              # Smart skill with auto-detection
+│   └── qr-code/             # Skill folder
+└── PLUGIN/                  # Full plugin with advanced features
+    ├── openclaw.plugin.json # Plugin manifest
+    ├── scripts/             # Python implementation  
+    └── index.ts            # Enhanced plugin with smart detection
 ```
 
-## ❓ 常见问题
+## 🔒 Security
 
-### Q: 安装后没有反应？
-**A**: 确保已重启 OpenClaw (`openclaw gateway restart`)，并检查 Python 依赖是否安装成功。
+- Input validation and sanitization
+- Protection against path traversal attacks  
+- Safe error handling
+- Secure temporary file management
 
-### Q: Logo 不显示？
-**A**: 确保 logo 文件放在 `~/clawd/qr-assets/` 目录，并且是 PNG/JPG 格式。
+## 🎯 Usage Examples
 
-### Q: 如何卸载？
-**A**: 删除相关目录并重启：
-```bash
-rm -rf ~/.openclaw/plugins/qr-code-plugin ~/.openclaw/skills/qr-code
-openclaw gateway restart
+### Natural Language (Recommended)
+- "生成一个蓝色的二维码，内容是 https://example.com"
+- "这个二维码图片里是什么内容？" (attach image)
+- "让这个二维码看起来更好看，用我们的品牌颜色"
+- "为 WhatsApp 优化这个二维码"
+
+### Command Mode (Optional)
+```
+/qr generate https://example.com color=red backgroundColor=white
+/qr decode [attach QR image]  
+/qr beautify [attach QR image] color=blue size=12
 ```
 
-## 🔗 资源链接
-
-- **技能页面**: [ClawHub - openclaw-qr-code](https://clawhub.ai/zouyawen/openclaw-qr-code)
-- **最新文档**: 查看此 README 获取最新信息
-
-## 📜 许可证
+## 📜 License
 
 MIT License
